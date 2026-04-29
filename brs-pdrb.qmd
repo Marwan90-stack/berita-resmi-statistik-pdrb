@@ -48,22 +48,22 @@ df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
 
 Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 dibanding triwulan III-2025 (q-to-q) mengalami pertumbuhan sebesar 3,27 persen. Lapangan usaha yang mengalami pertumbuhan tertinggi adalah sektor Sekunder sebesar 5,85 persen; selanjutnya sektor tersier sebesar  3,79 persen; dan sektor primer sebesar -0,2 persen.
 
-Struktur PDRB Kabupaten Kepulauan Tanimbar menurut lapangan usaha atas dasar harga berlaku triwulan IV-2025 tidak menunjukkan perubahan berarti. Perekonomian Kabupaten Kepulauan Tanimbar masih didominasi oleh lapangan usaha sektor tersier sebesar 60,31 persen; diikuti oleh sektor primer sebesar 22,12 persen; dan sektor sekunder sebesar 17,48 persen.
-
-
 
 ```{r pertumbuhan-q-to-q}
 #| echo: false
 #| warning: false
 #| label: fig-pertumbuhan-quartal
-#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (q-to-q) (persen)"
-#| width: 100%
-#| fig-scap: Gambar
+#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (q-to-q)"
 #| fig-width: 8
 #| fig-height: 5
 
 line_chart(df_pertumbuhan_q)
 ```
+
+
+:::{columns:2}
+
+Struktur PDRB Kabupaten Kepulauan Tanimbar menurut lapangan usaha atas dasar harga berlaku triwulan IV-2025 tidak menunjukkan perubahan berarti. Perekonomian Kabupaten Kepulauan Tanimbar masih didominasi oleh lapangan usaha sektor tersier sebesar 60,31 persen; diikuti oleh sektor primer sebesar 22,12 persen; dan sektor sekunder sebesar 17,48 persen.
 
 
 ```{r}
@@ -80,12 +80,13 @@ df_distribusi <- cleaning_data_pie(df_distribusi)
 #| warning: false
 #| label: fig-distribusi
 #| fig-cap: "Distribusi PDRB Lapangan Usaha Triwulan IV 2025"
-#| fig-scap: Gambar
 #| fig-width: 3
 #| fig-height: 3
 
 pie_chart(df_distribusi, label_size = 3)
 ```
+
+:::
 
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)
@@ -107,9 +108,7 @@ df_pertumbuhan_y <- cleaning_data_line(df_pertumbuhan_y)
 #| echo: false
 #| warning: false
 #| label: fig-pertumbuhan-tahunan
-#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (y-to-y) (persen)"
-#| width: 100%
-#| fig-scap: Gambar
+#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (y-to-y)"
 #| fig-width: 8
 #| fig-height: 5
 
@@ -135,9 +134,7 @@ df_pertumbuhan_c <- cleaning_data_line(df_pertumbuhan_c)
 #| echo: false
 #| warning: false
 #| label: fig-pertumbuhan-cumulative
-#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (c-to-c) (persen)"
-#| width: 100%
-#| fig-scap: Gambar
+#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (c-to-c)"
 #| fig-width: 8
 #| fig-height: 5
 
@@ -171,9 +168,7 @@ df_pertumbuhan_pengeluaran_q <- clean_data_pengeluaran(df_pertumbuhan_pengeluara
 #| echo: false
 #| warning: false
 #| label: fig-pertumbuhan-pengeluaran
-#| fig-cap: "Pertumbuhan PDRB Pengeluaran (q-to-q) (persen)"
-#| width: 100%
-#| fig-scap: Gambar
+#| fig-cap: "Pertumbuhan PDRB Pengeluaran (q-to-q)"
 #| fig-width: 8
 #| fig-height: 5
 
@@ -182,6 +177,32 @@ line_chart_pengeluaran(
   label_size = 3,
   label_color = "#575757"
 )
+```
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+df_distribusi_2025 <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "distribusi"
+)
+
+df_distribusi_2025 <- clean_distribusi(df_distribusi_2025)
+
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-distribusi-pengeluaran
+#| fig-cap: "Distribusi PDRB Pengeluaran Triwulan IV 2025"
+#| fig-width: 8
+#| fig-height: 5
+
+bar_chart(df_distribusi_2025)
 ```
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)

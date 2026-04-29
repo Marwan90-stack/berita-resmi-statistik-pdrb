@@ -6,6 +6,7 @@ library(janitor)
 
 colors <- c("#AA5F81", "#F68838", "#E8B85A")
 
+colors4 <- c("#795B85", "#AA5F81", "#F68838", "#E8B85A")
 
 df_pertumbuhan_q <- read_excel(
   "data/olah-data.xlsx",
@@ -93,9 +94,10 @@ line_chart <- function(df = NULL) {
       color = "#575757",
       size = 3,
       hjust = 0.5,
+      check_overlap = TRUE
       # vjust = -0.75
     ) +
-    labs(x = "", y = "", color = "") +
+    labs(x = "", y = "Pertumbuhan (%)", color = "") +
     scale_color_manual(values = colors) +
     scale_x_continuous(breaks = seq(1, 8, 1), labels = triwulan) +
     theme_minimal() +
@@ -133,7 +135,7 @@ cleaning_data_pie <- function(df = NULL) {
     mutate(
       ymax = cumsum(nilai),
       label_nilai = number(nilai, decimal.mark = ","),
-      label = paste(Uraian, "\n", label_nilai)
+      label = paste0(Uraian, "\n", label_nilai, "%")
     )
 
   df$ymin = c(0, head(df$ymax, n = -1))
@@ -251,13 +253,14 @@ line_chart_pengeluaran <- function(
       group = komponen_pengeluaran
     )
   ) +
-    geom_line(linewidth = 1) +
-    geom_point() +
+    geom_line(linewidth = 1.25, show.legend = FALSE) +
+    geom_point(size = 2) +
     geom_text(
       aes(label = label, vjust = vjust),
       color = label_color,
       size = label_size,
-      hjust = 0
+      hjust = 0,
+      check_overlap = TRUE
     ) +
     scale_color_manual(values = colors3) +
     labs(
@@ -275,5 +278,64 @@ line_chart_pengeluaran <- function(
       margins = margin(t = 15, r = 5, b = 10, l = 5, unit = "pt"),
       axis.text.x = element_text(size = 11, face = "bold"),
       axis.text.y = element_text(size = 11, face = "bold"),
+    )
+}
+
+# Distribusi pengeluaran triwulan IV 2025
+
+df_distribusi_2025 <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "distribusi"
+)
+
+clean_distribusi <- function(df = NULL) {
+  df <- df %>%
+    clean_names() %>%
+    mutate(
+      kategori = case_when(
+        komponen_pengeluaran == "1. Pengeluaran Konsumsi Rumah Tangga" ~ "PKRT",
+        komponen_pengeluaran == "3. Pengeluaran Konsumsi Pemerintah" ~ "PKP",
+        komponen_pengeluaran == "4. Pembentukan Modal Tetap Bruto" ~ "PMTB",
+        TRUE ~ "Lainnya"
+      ),
+    ) %>%
+    group_by(kategori) %>%
+    summarise(
+      nilai = round(sum(q4_2025), 2)
+    ) %>%
+    mutate(
+      label = paste0(number(nilai, decimal.mark = ","), "%"),
+      hjust = if_else(nilai < 0, 1.25, -0.25)
+    )
+}
+
+bar_chart <- function(df = NULL) {
+  ggplot(
+    df_distribusi_2025,
+    aes(y = fct_reorder(kategori, nilai), x = nilai, fill = kategori)
+  ) +
+    geom_bar(stat = "identity") +
+    geom_text(
+      aes(label = label, hjust = hjust),
+      x = 0,
+      color = "white",
+      size = 4.5,
+      vjust = 0.5,
+    ) +
+    scale_fill_manual(values = colors4) +
+    labs(
+      x = "",
+      y = "",
+      fill = ""
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      legend.position = "none",
+      legend.key.size = unit(10, "pt"),
+      axis.text.x = element_text(size = 11, face = "bold"),
+      axis.text.y = element_text(size = 11, face = "bold"),
+      margins = margin(t = 15, r = 5, b = 10, l = 5, unit = "pt")
     )
 }
