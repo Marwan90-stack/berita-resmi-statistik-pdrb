@@ -6,7 +6,7 @@
 ) = {
   set page(
     paper: "a4",
-    margin: (x: 3em, y: 4em),
+    margin: (x: 4em, y: 4em),
 
     footer: [
       #rect(
@@ -19,7 +19,7 @@
       width: 100%, 
       height: 100%, 
       // inset: 2em, 
-      outset: (left: 3em, right: 4em)
+      outset: (left: 4em, right: 4em)
     )
     ],
     header: context {

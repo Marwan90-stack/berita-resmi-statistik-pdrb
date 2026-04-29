@@ -66,7 +66,27 @@ line_chart(df_pertumbuhan_q)
 ```
 
 
-{{< pagebreak >}}
+```{r}
+#| echo: false
+#| warning: false
+df_distribusi <- read_excel("data/olah-data.xlsx", sheet = "distribusi")
+
+df_distribusi <- cleaning_data_pie(df_distribusi)
+
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-distribusi
+#| fig-cap: "Distribusi PDRB Lapangan Usaha Triwulan IV 2025"
+#| fig-scap: Gambar
+#| fig-width: 3
+#| fig-height: 3
+
+pie_chart(df_distribusi, label_size = 3)
+```
+
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)
 
@@ -96,8 +116,6 @@ df_pertumbuhan_y <- cleaning_data_line(df_pertumbuhan_y)
 line_chart(df_pertumbuhan_y)
 ```
 
-
-{{< pagebreak >}}
 
 ## Pertumbuhan Ekonomi Kumulatif Triwulan IV-2025 Terhadap Kumulatif Triwulan IV-2024 (c-to-c)
 
@@ -136,6 +154,35 @@ line_chart(df_pertumbuhan_c)
 Ekonomi Kabupaten Kepulauan Tanimbar pada triwulan IV-2025 mengalami peningkatan pertumbuhan sebesar 3,27 persen dibandingkan triwulan sebelumnya (q-to-q). Kontraksi pertumbuhan ini ini didorong oleh Komponen Konsumsi Akhir Pemerintah (PK-P)  yang mengalami kontraksi pertumbuhan sebesar 21,44 persen, diikuti oleh Konsumsi Akhir Rumah Tangga (PK-RT) sebesar 3,79 persen dan Pembentukan Modal Tetap Bruto (PMTB) yang mengalami pertumbuhan sebesr 2,82 persen.
 
 Menurut Pengeluaran, Struktur perekonomian Kabupaten Kepulauan Tanimbar  didominasi oleh komponen PK-RT yang mencakup lebih dari separuh PDRB Kabupaten Kepulauan Tanimbar yaitu sebesar 80,15 persen; komponen PMTB sebesar 47,09 persen dan komponen PK-P sebesar 33,51 persen.
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+df_pertumbuhan_pengeluaran_q <- read_excel("data/8101 PDRB Pengeluaran TW 4 2025.xlsx", sheet = "pertumbuhan_q_to_q")
+
+
+df_pertumbuhan_pengeluaran_q <- clean_data_pengeluaran(df_pertumbuhan_pengeluaran_q)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-pertumbuhan-pengeluaran
+#| fig-cap: "Pertumbuhan PDRB Pengeluaran (q-to-q) (persen)"
+#| width: 100%
+#| fig-scap: Gambar
+#| fig-width: 8
+#| fig-height: 5
+
+line_chart_pengeluaran(
+  df_pertumbuhan_pengeluaran_q,
+  label_size = 3,
+  label_color = "#575757"
+)
+```
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)
 
