@@ -2,7 +2,7 @@ library(tidyverse)
 library(readxl)
 library(scales)
 library(janitor)
-
+# library(ggtext)
 
 colors <- c("#AA5F81", "#F68838", "#E8B85A")
 
@@ -12,18 +12,6 @@ df_pertumbuhan_q <- read_excel(
   "data/olah-data.xlsx",
   sheet = "pertumbuhan_q_to_q"
 )
-
-# df_pertumbuhan_q <- df_pertumbuhan_q %>%
-#   filter(!is.na(Kategori)) %>%
-#   select(-Kategori) %>%
-#   pivot_longer(-Uraian, names_to = "triwulan", values_to = "nilai") %>%
-#   mutate(
-#     x = rep(1:8, 3),
-#     Uraian = as.factor(Uraian), #, levels = c("Primer", "Sekunder", "Tersier"),
-#     vjust = if_else(nilai < 0, 1.05, -1.05),
-#     label = scales::number(round(nilai, 2), decimal.mark = ",")
-#   )
-# levels(df_pertumbuhan_q$Uraian) <- c("Primer", "Sekunder", "Tersier")
 
 triwulan <- c(
   "Q1 2024",
@@ -44,7 +32,7 @@ cleaning_data_line <- function(df = NULL) {
     mutate(
       x = rep(1:8, 3),
       Uraian = as.factor(Uraian), #, levels = c("Primer", "Sekunder", "Tersier")
-      vjust = if_else(nilai < 0, 1.15, -0.75),
+      vjust = if_else(nilai < 4.2, 1.15, -0.50),
       label = scales::number(round(nilai, 2), decimal.mark = ",")
     )
   levels(df$Uraian) <- c("Primer", "Sekunder", "Tersier")
@@ -53,34 +41,6 @@ cleaning_data_line <- function(df = NULL) {
 }
 
 df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
-# ggplot(
-#   df_pertumbuhan_q,
-#   aes(x = x, y = nilai, color = Uraian, , group = Uraian)
-# ) +
-#   geom_line(show.legend = FALSE, linewidth = 1) +
-#   geom_point(size = 2) +
-#   geom_text(
-#     aes(label = round(nilai, 2)),
-#     color = "#575757",
-#     size = 3,
-#     hjust = 0.5,
-#     vjust = -0.75
-#   ) +
-#   labs(x = "", y = "", color = "") +
-#   scale_color_manual(values = colors) +
-#   scale_x_continuous(breaks = seq(1, 8, 1), labels = triwulan) +
-#   theme_minimal() +
-#   theme(
-#     # plot.background = element_rect(fill = "white"),
-#     # panel.background = element_rect(fill = "white"),
-#     panel.grid.major.y = element_line(color = "#d3d2d2", linewidth = 0.25),
-#     panel.grid.minor.y = element_blank(),
-#     panel.grid.major.x = element_blank(),
-#     panel.grid.minor.x = element_blank(),
-#     legend.position = "bottom",
-#     axis.line.x = element_line(color = "#575757", linewidth = 1),
-#     axis.ticks.x = element_line(color = "#575757", linewidth = 1)
-#   )
 
 line_chart <- function(df = NULL) {
   ggplot(
@@ -109,16 +69,16 @@ line_chart <- function(df = NULL) {
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
       legend.position = "top",
+      legend.justification = c("left", "top"),
       axis.line.x = element_line(color = "#575757", linewidth = 1),
       axis.ticks.x = element_line(color = "#575757", linewidth = 1),
       axis.text.x = element_text(size = 11, face = "bold"),
       axis.text.y = element_text(size = 11, face = "bold"),
-      margins = margin(t = 15, r = 5, b = 10, l = 5, unit = "pt")
+      margins = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
     )
 }
 
-line_chart(df_pertumbuhan_q)
-
+# line_chart(df_pertumbuhan_q)
 
 df_distribusi <- read_excel("data/olah-data.xlsx", sheet = "distribusi")
 
@@ -146,14 +106,6 @@ cleaning_data_pie <- function(df = NULL) {
   df
 }
 # Pie chart:
-
-# ggplot(df_distribusi, aes(ymin = ymin, ymax = ymax, xmin = 3, xmax = 4, fill = Uraian)) +
-#   geom_rect(show.legend = FALSE) +
-#   geom_text(aes(y = label_position, label = label), x = 3.5, size = 3.5, color = "white") +
-#   coord_polar(theta = "y") +
-#   scale_fill_manual(values = colors) +
-#   xlim(c(2, 4)) +
-#   theme_void()
 
 pie_chart <- function(df = NULL, label_color = "white", label_size = 3.5) {
   ggplot(df, aes(ymin = ymin, ymax = ymax, xmin = 3, xmax = 4, fill = Uraian)) +
@@ -201,7 +153,7 @@ clean_data_pengeluaran <- function(df = NULL) {
       triwulan = factor(triwulan),
       kategori = factor(kategori),
       label = number(round(nilai, 2), decimal.mark = ","),
-      vjust = if_else(nilai < 0, 1.05, -0.5),
+      vjust = if_else(nilai < 0, 1.05, -0.25),
       color = case_when(
         kategori == "PKRT" ~ "#AA5F81",
         kategori == "PKP" ~ "#F68838",
@@ -271,8 +223,10 @@ line_chart_pengeluaran <- function(
     theme_minimal() +
     theme(
       legend.position = "top",
+      legend.justification = c("left", "top"),
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
       axis.line.x = element_line(color = "#575757", linewidth = 1),
       axis.ticks.x = element_line(color = "#575757", linewidth = 1),
       margins = margin(t = 15, r = 5, b = 10, l = 5, unit = "pt"),
@@ -337,5 +291,79 @@ bar_chart <- function(df = NULL) {
       axis.text.x = element_text(size = 11, face = "bold"),
       axis.text.y = element_text(size = 11, face = "bold"),
       margins = margin(t = 15, r = 5, b = 10, l = 5, unit = "pt")
+    )
+}
+
+df_pertumbuhan_pengeluaran_y <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "pertumbuhan_y_on_y"
+)
+
+
+cleaning_data_pertumbuhan_pengeluaran <- function(df = NULL) {
+  df <- df %>%
+    filter(`Komponen Pengeluaran` != "P D R B") %>%
+    pivot_longer(
+      -`Komponen Pengeluaran`,
+      names_to = "triwulan",
+      values_to = "nilai"
+    ) %>%
+    mutate(
+      kategori = case_when(
+        `Komponen Pengeluaran` ==
+          "1. Pengeluaran Konsumsi Rumah Tangga" ~ "PKRT",
+        `Komponen Pengeluaran` == "3. Pengeluaran Konsumsi Pemerintah" ~ "PKP",
+        `Komponen Pengeluaran` == "4. Pembentukan Modal Tetap Bruto" ~ "PMTB",
+        TRUE ~ "Lainnya"
+      )
+    ) %>%
+    filter(kategori != "Lainnya") %>%
+    mutate(
+      nilai = round(nilai, 2),
+      label = number(nilai, decimal.mark = ","),
+      triwulan = factor(triwulan),
+      vjust = if_else(nilai < 2, 1.35, -0.35)
+    )
+
+  levels(df$triwulan) <- triwulan
+  df
+}
+
+line_chart_pertumbuhan_pengeluaran <- function(
+  df = NULL,
+  label_size = 2.5,
+  label_color = "#575757"
+) {
+  ggplot(
+    df,
+    aes(x = triwulan, y = nilai, color = kategori, group = kategori)
+  ) +
+    geom_line(show.legend = FALSE, linewidth = 1.25) +
+    geom_point(size = 2) +
+    geom_text(
+      aes(label = label, vjust = vjust),
+      color = label_color,
+      size = label_size,
+      hjust = 0.5,
+      check_overlap = TRUE
+    ) +
+    scale_color_manual(values = colors3) +
+    labs(
+      x = "",
+      y = "Pertumbuhan (%)",
+      color = ""
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      legend.justification = c("left", "top"),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.line.x = element_line(color = "#575757", linewidth = 1),
+      axis.ticks.x = element_line(color = "#575757", linewidth = 1),
+      margins = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt"),
+      axis.text.x = element_text(size = 11, face = "bold"),
+      axis.text.y = element_text(size = 11, face = "bold"),
     )
 }

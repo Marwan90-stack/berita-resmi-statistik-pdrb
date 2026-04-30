@@ -40,11 +40,28 @@ df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
 
 - Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 (c-to-c) tumbuh sebesar 4,58 persen. Dari sisi produksi, pertumbuhan tertinggi dicapai sektor primer sebesar 5,9 persen. Dari sisi pengeluaran, pertumbuhan tertinggi dicapai oleh komponen konsumsi Akhir non Publik yang tumbuh sebesar 3,8 persen.
 
+```{=typst}
+#orangeline()
+```
 {{< pagebreak >}}
 
 # PDRB Menurut Lapangan Usaha
 
 ## Pertumbuhan Ekonomi Triwulan IV- 2025 Terhadap Triwulan III-2025 (q-to-q)
+
+
+```{=typst}
+#grid(
+  columns: (1fr, 3fr),
+[
+#status-box(top-box-text: [1500M], bottom-box-text: [4.59%])
+],
+[
+PDRB kabupaten Kepulauan Tanimbar pada triwulan IV 2025 sebesar 1500 Miliar Rupiah. Pada periode yang sama, pertumbuhan ekonomi sebesar 4,59 persen secara q-to-q (dibandingkan periode Triwulan III 2025).
+]
+)
+// #orangeline()
+```
 
 Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 dibanding triwulan III-2025 (q-to-q) mengalami pertumbuhan sebesar 3,27 persen. Lapangan usaha yang mengalami pertumbuhan tertinggi adalah sektor Sekunder sebesar 5,85 persen; selanjutnya sektor tersier sebesar  3,79 persen; dan sektor primer sebesar -0,2 persen.
 
@@ -54,16 +71,23 @@ Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 dibanding triwulan III-202
 #| warning: false
 #| label: fig-pertumbuhan-quartal
 #| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (q-to-q)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 7.5
+#| fig-height: 4.5
 
 line_chart(df_pertumbuhan_q)
 ```
 
 
-:::{columns:2}
+{{< pagebreak >}}
 
-Struktur PDRB Kabupaten Kepulauan Tanimbar menurut lapangan usaha atas dasar harga berlaku triwulan IV-2025 tidak menunjukkan perubahan berarti. Perekonomian Kabupaten Kepulauan Tanimbar masih didominasi oleh lapangan usaha sektor tersier sebesar 60,31 persen; diikuti oleh sektor primer sebesar 22,12 persen; dan sektor sekunder sebesar 17,48 persen.
+```{=typst}
+#grid(
+  columns: (1fr, 1fr),
+  [
+    Struktur PDRB Kabupaten Kepulauan Tanimbar menurut lapangan usaha atas dasar harga berlaku triwulan IV-2025 tidak menunjukkan perubahan berarti. Perekonomian Kabupaten Kepulauan Tanimbar masih didominasi oleh lapangan usaha sektor tersier sebesar 60,31 persen; diikuti oleh sektor primer sebesar 22,12 persen; dan sektor sekunder sebesar 17,48 persen.
+  ],
+  [
+```
 
 
 ```{r}
@@ -80,13 +104,18 @@ df_distribusi <- cleaning_data_pie(df_distribusi)
 #| warning: false
 #| label: fig-distribusi
 #| fig-cap: "Distribusi PDRB Lapangan Usaha Triwulan IV 2025"
-#| fig-width: 3
-#| fig-height: 3
+#| fig-width: 2.5
+#| fig-height: 2.5
+
 
 pie_chart(df_distribusi, label_size = 3)
 ```
 
-:::
+```{=typst}
+]
+)
+// #orangeline()
+```
 
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)
@@ -109,8 +138,8 @@ df_pertumbuhan_y <- cleaning_data_line(df_pertumbuhan_y)
 #| warning: false
 #| label: fig-pertumbuhan-tahunan
 #| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (y-to-y)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 7.5
+#| fig-height: 4.5
 
 line_chart(df_pertumbuhan_y)
 ```
@@ -135,8 +164,8 @@ df_pertumbuhan_c <- cleaning_data_line(df_pertumbuhan_c)
 #| warning: false
 #| label: fig-pertumbuhan-cumulative
 #| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (c-to-c)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 7.5
+#| fig-height: 4.5
 
 line_chart(df_pertumbuhan_c)
 ```
@@ -150,9 +179,6 @@ line_chart(df_pertumbuhan_c)
 
 Ekonomi Kabupaten Kepulauan Tanimbar pada triwulan IV-2025 mengalami peningkatan pertumbuhan sebesar 3,27 persen dibandingkan triwulan sebelumnya (q-to-q). Kontraksi pertumbuhan ini ini didorong oleh Komponen Konsumsi Akhir Pemerintah (PK-P)  yang mengalami kontraksi pertumbuhan sebesar 21,44 persen, diikuti oleh Konsumsi Akhir Rumah Tangga (PK-RT) sebesar 3,79 persen dan Pembentukan Modal Tetap Bruto (PMTB) yang mengalami pertumbuhan sebesr 2,82 persen.
 
-Menurut Pengeluaran, Struktur perekonomian Kabupaten Kepulauan Tanimbar  didominasi oleh komponen PK-RT yang mencakup lebih dari separuh PDRB Kabupaten Kepulauan Tanimbar yaitu sebesar 80,15 persen; komponen PMTB sebesar 47,09 persen dan komponen PK-P sebesar 33,51 persen.
-
-
 ```{r}
 #| echo: false
 #| warning: false
@@ -164,13 +190,14 @@ df_pertumbuhan_pengeluaran_q <- read_excel("data/8101 PDRB Pengeluaran TW 4 2025
 df_pertumbuhan_pengeluaran_q <- clean_data_pengeluaran(df_pertumbuhan_pengeluaran_q)
 ```
 
+
 ```{r}
 #| echo: false
 #| warning: false
 #| label: fig-pertumbuhan-pengeluaran
 #| fig-cap: "Pertumbuhan PDRB Pengeluaran (q-to-q)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 7.5
+#| fig-height: 4
 
 line_chart_pengeluaran(
   df_pertumbuhan_pengeluaran_q,
@@ -179,6 +206,22 @@ line_chart_pengeluaran(
 )
 ```
 
+
+```{=typst}
+
+#grid(
+  columns: (1fr, 2fr),
+  [
+
+```
+
+Menurut Pengeluaran, Struktur perekonomian Kabupaten Kepulauan Tanimbar  didominasi oleh komponen PK-RT yang mencakup lebih dari separuh PDRB Kabupaten Kepulauan Tanimbar yaitu sebesar 80,15 persen; komponen PMTB sebesar 47,09 persen dan komponen PK-P sebesar 33,51 persen.
+
+
+```{=typst}
+  ],
+  [
+```
 
 ```{r}
 #| echo: false
@@ -199,21 +242,75 @@ df_distribusi_2025 <- clean_distribusi(df_distribusi_2025)
 #| warning: false
 #| label: fig-distribusi-pengeluaran
 #| fig-cap: "Distribusi PDRB Pengeluaran Triwulan IV 2025"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: 7.5
+#| fig-height: 4.5
 
 bar_chart(df_distribusi_2025)
 ```
+
+```{=typst}
+  ]
+)
+```
+
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)
 
 Ekonomi Kabupaten Kepulauan Tanimbar pada triwulan I-2025 terhadap triwulan I-2025 (y-on-y) tumbuh sebesar 5,01 persen. Pertumbuhan tertinggi terjadi pada komponen konsumsi akhir Pemerintah yang tumbuh sebesar 9,68 persen; diikuti oleh komponen akhir Rumah Tangga yang tumbuh sebesar 3,70 persen, dan komponen Pembentukan Modal Tetap Bruto sebesar 1,93 persen.
 
-{{< pagebreak >}}
+```{r}
+#| echo: false
+#| warning: false
+
+df_pertumbuhan_pengeluaran_y <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "pertumbuhan_y_on_y"
+)
+
+df_pertumbuhan_pengeluaran_y <- cleaning_data_pertumbuhan_pengeluaran(df_pertumbuhan_pengeluaran_y)
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-pertumbuhan-pengeluaran-y-on-y
+#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (y-to-y)"
+#| fig-width: 7.5
+#| fig-height: 4
+
+line_chart_pertumbuhan_pengeluaran(df_pertumbuhan_pengeluaran_y)
+```
+
+
 
 ## Pertumbuhan Ekonomi Kumulatif Triwulan IV-2024 Terhadap Kumulatif Triwulan IV-2023 (c-to-c)
 
 Ekonomi Kabupaten Kepulauan Tanimbar kumulatif triwulan IV-2024 terhadap triwulan IV-2023 (y-on-y) tumbuh sebesar 5,83 persen. Pertumbuhan tertinggi terjadi pada komponen konsumsi akhir rumah tangga yang tumbuh sebesar 4,24 persen; diikuti oleh komponen Pembentukan Modal Tetap Bruto yang tumbuh sebesar 2,97 persen, dan komponen Konsumsi Akhir Pemerintah sebesar 2,20 persen.
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+df_pertumbuhan_pengeluaran_c <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "pertumbuhan_c_to_c"
+)
+
+df_pertumbuhan_pengeluaran_c <- cleaning_data_pertumbuhan_pengeluaran(df_pertumbuhan_pengeluaran_c)
+```
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-pertumbuhan-pengeluaran-c-on-c
+#| fig-cap: "Pertumbuhan PDRB Seluruh Sektor Lapangan Usaha (c-to-c)"
+#| fig-width: 7.5
+#| fig-height: 4
+
+line_chart_pertumbuhan_pengeluaran(df_pertumbuhan_pengeluaran_c)
+```
 
 {{< pagebreak >}}
 
