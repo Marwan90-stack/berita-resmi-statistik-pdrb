@@ -433,6 +433,9 @@ clean_data_adhb_adhk <- function(df = NULL) {
 
 df_pdrb_wide <- clean_data_adhb_adhk(df_pdrb_adhb_adhk)
 
+
+# Fungsi untuk membuat tabel PDRB ADHB dan ADHK Triwulan I - IV 2025
+
 create_table_adhb_adhk <- function(df_wide = NULL) {
   df_wide %>%
     gt() %>%
@@ -517,6 +520,9 @@ df_pertumbuhan_34_wide <- df_pertumbuhan_34 %>%
     Uraian = if_else(Uraian == "PRODUK DOMESTIK REGIONAL BRUTO", "PDRB", Uraian)
   )
 
+
+# Fungsi untuk membuat tabel pertumbuhan PDRB
+
 create_table_pertumbuhan <- function(df_wide = NULL) {
   df_wide %>%
     gt() %>%
@@ -573,6 +579,7 @@ create_table_pertumbuhan <- function(df_wide = NULL) {
     )
 }
 
+# Fungsi untuk membuat tabel distribusi PDRB lapangan usaha
 create_table_distribusi <- function(df = NULL) {
   df %>%
     mutate(
