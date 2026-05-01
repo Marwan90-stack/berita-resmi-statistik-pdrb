@@ -85,6 +85,7 @@ line_chart <- function(df = NULL) {
     theme(
       # plot.background = element_rect(fill = "white"),
       # panel.background = element_rect(fill = "white"),
+      text = element_text(family = "Lato"),
       panel.grid.major.y = element_line(color = "#d3d2d2", linewidth = 0.25),
       panel.grid.minor.y = element_blank(),
       panel.grid.major.x = element_blank(),
@@ -140,7 +141,10 @@ pie_chart <- function(df = NULL, label_color = "white", label_size = 3.5) {
     coord_polar(theta = "y") +
     scale_fill_manual(values = colors) +
     xlim(c(2, 4)) +
-    theme_void()
+    theme_void() +
+    theme(
+      text = element_text(family = "Lato")
+    )
 }
 
 # pie_chart(df_distribusi, label_size = 4)
@@ -243,6 +247,7 @@ line_chart_pengeluaran <- function(
     ) +
     theme_minimal() +
     theme(
+      text = element_text(family = "Lato"),
       legend.position = "top",
       legend.justification = c("left", "top"),
       panel.grid.major.x = element_blank(),
@@ -305,6 +310,7 @@ bar_chart <- function(df = NULL) {
     ) +
     theme_minimal() +
     theme(
+      text = element_text(family = "Lato"),
       panel.grid.minor.x = element_blank(),
       panel.grid.minor.y = element_blank(),
       legend.position = "none",
@@ -376,6 +382,7 @@ line_chart_pertumbuhan_pengeluaran <- function(
     ) +
     theme_minimal() +
     theme(
+      text = element_text(family = "Lato"),
       legend.position = "top",
       legend.justification = c("left", "top"),
       panel.grid.major.x = element_blank(),
@@ -491,7 +498,7 @@ create_table_adhb_adhk <- function(df_wide = NULL) {
       table.border.top.width = px(1),
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
-
+      table.font.names = "Lato"
       # data_row.padding = px(20),
       # column_labels.padding = px(25),
     )
@@ -573,7 +580,7 @@ create_table_pertumbuhan <- function(df_wide = NULL) {
       table.border.top.width = px(1),
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
-
+      table.font.names = "Lato"
       # data_row.padding = px(20),
       # column_labels.padding = px(25),
     )
@@ -630,7 +637,8 @@ create_table_distribusi <- function(df = NULL) {
       table.border.top.width = px(1),
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
-
+      page.width = pct(100),
+      table.font.names = "Lato"
       # data_row.padding = px(20),
       # column_labels.padding = px(25),
       # table.width = pct(1000)

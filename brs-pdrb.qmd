@@ -27,6 +27,9 @@ source("visualisasi.R")
 
 ```{r, load-dataset}
 #| echo: false
+#| warning: false
+
+
 df_pertumbuhan_q <- read_excel("data/olah-data.xlsx", sheet = "pertumbuhan_q_to_q") 
 
 df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
@@ -108,7 +111,7 @@ df_distribusi2 <- cleaning_data_pie(df_distribusi)
 #| fig-height: 2.5
 
 
-pie_chart(df_distribusi2, label_size = 3)
+pie_chart(df_distribusi2, label_size = 2.5)
 ```
 
 ```{=typst}

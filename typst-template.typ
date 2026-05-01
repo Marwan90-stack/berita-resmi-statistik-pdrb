@@ -85,7 +85,13 @@
 
   set par(justify: true, leading: 1em, spacing: 2em)
 
-  set text(font: "PT Sans Caption", size: 12pt, fill: luma(90), lang: "id")
+  set text(
+    // font: "PT Sans Caption", 
+    font: "Lato",
+    size: 12pt, 
+    fill: luma(90), 
+    lang: "id"
+    )
 
   show heading: it => {
     let sizes = (
@@ -107,7 +113,8 @@
     set par(leading: leading)
     set block(spacing: spacing)
     set text(
-      font: "PT Sans Caption",
+      // font: "PT Sans Caption",
+      font: "Lato",
       size: size,
       fill: color,
       weight: "bold"
@@ -137,7 +144,7 @@ show figure: it => {
   it
 }
 
-set table(stroke: 0.25pt + luma(240))
+set table(stroke: 0.25pt + luma(240), inset: 8.5pt)
 
 // show figure.where(kind: image): set figure.caption(prefix: "Gambar")
 
