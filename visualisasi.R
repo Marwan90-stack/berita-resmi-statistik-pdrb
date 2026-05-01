@@ -492,8 +492,8 @@ create_table_adhb_adhk <- function(df_wide = NULL) {
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
 
-      data_row.padding = px(20),
-      column_labels.padding = px(25),
+      # data_row.padding = px(20),
+      # column_labels.padding = px(25),
     )
 }
 
@@ -574,8 +574,8 @@ create_table_pertumbuhan <- function(df_wide = NULL) {
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
 
-      data_row.padding = px(20),
-      column_labels.padding = px(25),
+      # data_row.padding = px(20),
+      # column_labels.padding = px(25),
     )
 }
 
@@ -631,7 +631,8 @@ create_table_distribusi <- function(df = NULL) {
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
 
-      data_row.padding = px(20),
-      column_labels.padding = px(25),
+      # data_row.padding = px(20),
+      # column_labels.padding = px(25),
+      # table.width = pct(1000)
     )
 }
