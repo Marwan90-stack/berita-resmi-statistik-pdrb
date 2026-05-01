@@ -54,7 +54,7 @@ df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
 #grid(
   columns: (1fr, 3fr),
 [
-#status-box(top-box-text: [1500M], bottom-box-text: [4.59%])
+#status-box(top-box-text: [1004M], bottom-box-text: [3,27%])
 ],
 [
 PDRB kabupaten Kepulauan Tanimbar pada triwulan IV 2025 sebesar 1500 Miliar Rupiah. Pada periode yang sama, pertumbuhan ekonomi sebesar 4,59 persen secara q-to-q (dibandingkan periode Triwulan III 2025).
@@ -95,7 +95,7 @@ line_chart(df_pertumbuhan_q)
 #| warning: false
 df_distribusi <- read_excel("data/olah-data.xlsx", sheet = "distribusi")
 
-df_distribusi <- cleaning_data_pie(df_distribusi)
+df_distribusi2 <- cleaning_data_pie(df_distribusi)
 
 ```
 
@@ -108,7 +108,7 @@ df_distribusi <- cleaning_data_pie(df_distribusi)
 #| fig-height: 2.5
 
 
-pie_chart(df_distribusi, label_size = 3)
+pie_chart(df_distribusi2, label_size = 3)
 ```
 
 ```{=typst}
@@ -314,16 +314,77 @@ line_chart_pertumbuhan_pengeluaran(df_pertumbuhan_pengeluaran_c)
 
 {{< pagebreak >}}
 
-### Tabel 1 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Sektor Lapangan Usaha (miliar rupiah), Triwulan III Tahun 2025 dan Triwulan IV Tahun 2025
+### Tabel 1 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Sektor Lapangan Usaha (miliar rupiah), Triwulan I - IV Tahun 2025
 
-### Tabel 2 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Sektor  Lapangan Usaha (miliar rupiah), Triwulan II Tahun 2025 dan Triwulan I Tahun 2025
 
-### Tabel 3 Laju Pertumbuhan dan Sumber Pertumbuhan PDRB Menurut Sektor Lapangan Usaha (persen)
+```{r}
+#| echo: false
+#| warning: false
+#fig-width: 8.5
+#fig-height: 6
 
-### Tabel 4 Distribusi PDRB Menurut Sektor Lapangan Usaha (persen)
+df_pdrb_adhb_adhk <- read_excel(
+  "data/olah-data.xlsx",
+  sheet = "pdrb_adhb_adhk"
+)
 
-### Tabel 5 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Pengeluaran (miliar rupiah), Triwulan III Tahun 2025 dan Triwulan IV Tahun 2025
+df_pdrb_wide <- clean_data_adhb_adhk(df_pdrb_adhb_adhk)
 
-### Tabel 6 Laju Pertumbuhan dan Sumber Pertumbuhan PDRB Menurut Pengeluaran (persen)
+create_table_adhb_adhk(df_pdrb_wide)
+```
 
-### Tabel 7 Distribusi PDRB Menurut Pengeluaran (persen)
+
+
+### Tabel 2 Laju Pertumbuhan dan Sumber Pertumbuhan PDRB Menurut Sektor Lapangan Usaha (persen)
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+df_pertumbuhan_y_34 <- df_pertumbuhan_y %>%
+  filter(triwulan == "Q3 2025" | triwulan == "Q4 2025") %>%
+  select(Uraian, triwulan, nilai) %>%
+  mutate(kategori = rep("Y to Y", 8))
+
+df_pertumbuhan_q_34 <- df_pertumbuhan_q %>%
+  filter(triwulan == "Q3 2025" | triwulan == "Q4 2025") %>%
+  select(Uraian, triwulan, nilai) %>%
+  mutate(kategori = rep("Q to Q", 8))
+
+df_pertumbuhan_34 <- rbind(df_pertumbuhan_y_34, df_pertumbuhan_q_34)
+
+df_pertumbuhan_34_wide <- df_pertumbuhan_34 %>%
+  pivot_wider(
+    id_cols = Uraian,
+    names_from = c(triwulan, kategori),
+    values_from = nilai
+  ) %>%
+  mutate(
+    Uraian = if_else(Uraian == "PRODUK DOMESTIK REGIONAL BRUTO", "PDRB", Uraian)
+  )
+```
+
+```{r}
+#| echo: false
+#| warning: false
+
+create_table_pertumbuhan(df_pertumbuhan_34_wide)
+```
+
+
+### Tabel 3 Distribusi PDRB Menurut Sektor Lapangan Usaha (persen)
+
+```{r}
+#| echo: false
+#| warning: false
+#fig-width: 8
+
+create_table_distribusi(df_distribusi)
+```
+
+### Tabel 4 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Pengeluaran (miliar rupiah), Triwulan III Tahun 2025 dan Triwulan IV Tahun 2025
+
+### Tabel 5 Laju Pertumbuhan dan Sumber Pertumbuhan PDRB Menurut Pengeluaran (persen)
+
+### Tabel 6 Distribusi PDRB Menurut Pengeluaran (persen)

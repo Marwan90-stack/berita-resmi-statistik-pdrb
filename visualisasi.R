@@ -2,6 +2,7 @@ library(tidyverse)
 library(readxl)
 library(scales)
 library(janitor)
+library(gt)
 # library(ggtext)
 
 colors <- c("#AA5F81", "#F68838", "#E8B85A")
@@ -26,27 +27,47 @@ triwulan <- c(
 
 cleaning_data_line <- function(df = NULL) {
   df_clean <- df %>%
-    filter(Uraian != "PRODUK DOMESTIK REGIONAL BRUTO") %>%
+    # filter(Uraian != "PRODUK DOMESTIK REGIONAL BRUTO") %>%
     # select(-Kategori) %>%
     pivot_longer(-Uraian, names_to = "triwulan", values_to = "nilai") %>%
     mutate(
-      x = rep(1:8, 3),
-      Uraian = as.factor(Uraian), #, levels = c("Primer", "Sekunder", "Tersier")
+      x = rep(1:8, 4),
+      # triwulan = as.factor(triwulan),
+      Uraian = as.factor(Uraian),
       vjust = if_else(nilai < 4.2, 1.15, -0.50),
       label = scales::number(round(nilai, 2), decimal.mark = ",")
     )
   levels(df$Uraian) <- c("Primer", "Sekunder", "Tersier")
+  # levels(df$triwulan) <- c(
+  #   "Q1 2024",
+  #   "Q2 2024",
+  #   "Q3 2024",
+  #   "Q4 2024",
+  #   "Q1 2025",
+  #   "Q2 2025",
+  #   "Q3 2025",
+  #   "Q4 2025"
+  # )
 
   df_clean
 }
 
 df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
 
+df_pertumbuhan_y <- read_excel(
+  "data/olah-data.xlsx",
+  sheet = "pertumbuhan_y_on_y"
+)
+
+df_pertumbuhan_y <- cleaning_data_line(df_pertumbuhan_y)
+
 line_chart <- function(df = NULL) {
-  ggplot(
-    df,
-    aes(x = x, y = nilai, color = Uraian, , group = Uraian)
-  ) +
+  df %>%
+    filter(Uraian != "PRODUK DOMESTIK REGIONAL BRUTO") %>%
+    ggplot(
+      # df,
+      aes(x = x, y = nilai, color = Uraian, , group = Uraian)
+    ) +
     geom_line(show.legend = FALSE, linewidth = 1.25) +
     geom_point(size = 2) +
     geom_text(
@@ -365,5 +386,245 @@ line_chart_pertumbuhan_pengeluaran <- function(
       margins = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt"),
       axis.text.x = element_text(size = 11, face = "bold"),
       axis.text.y = element_text(size = 11, face = "bold"),
+      # panel.background = element_rect(fill = "#FFFFFF", alpha = 0),
+      # plot.background = element_rect(fill = "#FFFFFF", alpha = 0),
+    )
+}
+
+df_pdrb_adhb_adhk <- read_excel(
+  "data/olah-data.xlsx",
+  sheet = "pdrb_adhb_adhk"
+)
+
+
+clean_data_adhb_adhk <- function(df = NULL) {
+  df_clean <- df %>%
+    # filter(Uraian != "PRODUK DOMESTIK REGIONAL BRUTO") %>%
+    pivot_longer(-Uraian, names_to = "jenis", values_to = "nilai") %>%
+    mutate(
+      triwulan = str_extract(jenis, pattern = "Q+\\d"),
+      kategori = str_remove(jenis, pattern = "Q+\\d+-"),
+      nilai = round(nilai / 1000, 2),
+      Uraian = if_else(
+        Uraian == "PRODUK DOMESTIK REGIONAL BRUTO",
+        "PDRB",
+        Uraian
+      )
+    ) %>%
+    select(-jenis) %>%
+    mutate(
+      kategori = if_else(kategori == "adhb", "Harga Berlaku", "Harga Konstan"),
+      triwulan = case_when(
+        triwulan == "Q1" ~ "Triwulan I",
+        triwulan == "Q2" ~ "Triwulan II",
+        triwulan == "Q3" ~ "Triwulan III",
+        TRUE ~ "Triwulan IV"
+      )
+    )
+
+  df_wide <- df_clean %>%
+    pivot_wider(
+      id_cols = Uraian,
+      names_from = c(kategori, triwulan),
+      values_from = nilai
+    )
+  df_wide
+}
+
+df_pdrb_wide <- clean_data_adhb_adhk(df_pdrb_adhb_adhk)
+
+create_table_adhb_adhk <- function(df_wide = NULL) {
+  df_wide %>%
+    gt() %>%
+    gt::fmt_number(dec_mark = ",", sep_mark = ".") %>%
+    gt::tab_spanner(
+      label = "Harga Berlaku",
+      columns = starts_with("Harga Berlaku")
+    ) %>%
+    gt::tab_spanner(
+      label = "Harga Konstan",
+      columns = starts_with("Harga Konstan")
+    ) %>%
+    # tab_header(
+    #   title = "PDRB Atas Dasar Harga Berlaku dan harga Konstan 2010 Menurut Sektor Triwulan I - IV 2025"
+    # ) %>%
+    gt::cols_label(
+      `Harga Berlaku_Triwulan I` = "Triwulan I 2025",
+      `Harga Berlaku_Triwulan II` = "Triwulan II 2025",
+      `Harga Berlaku_Triwulan III` = "Triwulan III 2025",
+      `Harga Berlaku_Triwulan IV` = "Triwulan IV 2025",
+      `Harga Konstan_Triwulan I` = "Triwulan I 2025",
+      `Harga Konstan_Triwulan II` = "Triwulan II 2025",
+      `Harga Konstan_Triwulan III` = "Triwulan III 2025",
+      `Harga Konstan_Triwulan IV` = "Triwulan IV 2025",
+      Uraian = "Komponen"
+    ) %>%
+    data_color(
+      colors = c("#AA5F81", "#f1c161"),
+      columns = !contains("Uraian")
+    ) %>%
+    data_color(
+      colors = colors[2],
+      columns = contains("Uraian")
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_labels()
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_spanners()
+    ) %>%
+    tab_options(
+      table.border.top.color = "white",
+      table.border.right.color = "white",
+      table.border.bottom.color = "white",
+      table.border.left.color = "white",
+
+      table_body.hlines.color = "white",
+      table_body.vlines.color = "white",
+      heading.border.bottom.color = "white",
+
+      table.border.top.width = px(1),
+      table.border.bottom.width = px(1),
+      table.font.size = "10pt",
+
+      data_row.padding = px(20),
+      column_labels.padding = px(25),
+    )
+}
+
+# Gabungkan data pertumbuhan lapangan usaha y-to-y dan q-to-q
+df_pertumbuhan_y_34 <- df_pertumbuhan_y %>%
+  filter(triwulan == "Q3 2025" | triwulan == "Q4 2025") %>%
+  select(Uraian, triwulan, nilai) %>%
+  mutate(kategori = rep("Y to Y", 8))
+
+df_pertumbuhan_q_34 <- df_pertumbuhan_q %>%
+  filter(triwulan == "Q3 2025" | triwulan == "Q4 2025") %>%
+  select(Uraian, triwulan, nilai) %>%
+  mutate(kategori = rep("Q to Q", 8))
+
+df_pertumbuhan_34 <- rbind(df_pertumbuhan_y_34, df_pertumbuhan_q_34)
+
+df_pertumbuhan_34_wide <- df_pertumbuhan_34 %>%
+  pivot_wider(
+    id_cols = Uraian,
+    names_from = c(triwulan, kategori),
+    values_from = nilai
+  ) %>%
+  mutate(
+    Uraian = if_else(Uraian == "PRODUK DOMESTIK REGIONAL BRUTO", "PDRB", Uraian)
+  )
+
+create_table_pertumbuhan <- function(df_wide = NULL) {
+  df_wide %>%
+    gt() %>%
+    tab_spanner(label = "Y to Y", columns = contains("Y to Y")) %>%
+    tab_spanner(label = "Q to Q", columns = contains("Q to Q")) %>%
+    cols_label(
+      `Q3 2025_Y to Y` = "Triwulan III 2025",
+      `Q4 2025_Y to Y` = "Triwulan IV 2025",
+      `Q3 2025_Q to Q` = "Triwulan III 2025",
+      `Q4 2025_Q to Q` = "Triwulan IV 2025",
+    ) %>%
+    cols_label(Uraian = 'Komponen') %>%
+    fmt_number(dec_mark = ",", sep_mark = ".", decimals = 2) %>%
+    tab_footnote(
+      footnote = "y-on-y: PDRB ADHK pada suatu triwulan dibandingkan dengan triwulan yang sama tahun sebelumnya",
+      locations = cells_column_spanners(spanners = contains("Y to Y"))
+    ) %>%
+    tab_footnote(
+      footnote = "q-to-q: PDRB ADHK pada suatu triwulan dibandingkan dengan triwulan sebelumnya",
+      locations = cells_column_spanners(spanners = contains("Q to Q"))
+    ) %>%
+    data_color(
+      colors = c("#AA5F81", "#f1c161"),
+      columns = !contains("Uraian")
+    ) %>%
+    data_color(
+      colors = colors[2],
+      columns = contains("Uraian")
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_labels()
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_spanners()
+    ) %>%
+    tab_options(
+      table.border.top.color = "white",
+      table.border.right.color = "white",
+      table.border.bottom.color = "white",
+      table.border.left.color = "white",
+
+      table_body.hlines.color = "white",
+      table_body.vlines.color = "white",
+      heading.border.bottom.color = "white",
+
+      table.border.top.width = px(1),
+      table.border.bottom.width = px(1),
+      table.font.size = "10pt",
+
+      data_row.padding = px(20),
+      column_labels.padding = px(25),
+    )
+}
+
+create_table_distribusi <- function(df = NULL) {
+  df %>%
+    mutate(
+      Uraian = if_else(
+        Uraian == "PRODUK DOMESTIK REGIONAL BRUTO",
+        "PDRB",
+        Uraian
+      )
+    ) %>%
+    gt() %>%
+    cols_label(
+      `Q1 2025` = "Triwulan I 2025",
+      `Q2 2025` = "Triwulan II 2025",
+      `Q3 2025` = "Triwulan III 2025",
+      `Q4 2025` = "Triwulan IV 2025",
+      Uraian = "Komponen"
+    ) %>%
+    fmt_number(
+      dec_mark = ",",
+      sep_mark = "."
+    ) %>%
+    data_color(
+      colors = c("#AA5F81", "#f1c161"),
+      columns = !contains("Uraian")
+    ) %>%
+    data_color(
+      colors = colors[2],
+      columns = contains("Uraian")
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_labels()
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_spanners()
+    ) %>%
+    tab_options(
+      table.border.top.color = "white",
+      table.border.right.color = "white",
+      table.border.bottom.color = "white",
+      table.border.left.color = "white",
+
+      table_body.hlines.color = "white",
+      table_body.vlines.color = "white",
+      heading.border.bottom.color = "white",
+
+      table.border.top.width = px(1),
+      table.border.bottom.width = px(1),
+      table.font.size = "10pt",
+
+      data_row.padding = px(20),
+      column_labels.padding = px(25),
     )
 }
