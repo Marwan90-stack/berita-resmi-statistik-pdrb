@@ -469,6 +469,7 @@ create_table_adhb_adhk <- function(df_wide = NULL) {
       `Harga Konstan_Triwulan IV` = "Triwulan IV 2025",
       Uraian = "Komponen"
     ) %>%
+    # cols_width(Uraian = px(50)) %>%
     data_color(
       colors = c("#AA5F81", "#f1c161"),
       columns = !contains("Uraian")
@@ -484,6 +485,21 @@ create_table_adhb_adhk <- function(df_wide = NULL) {
     gt::tab_style(
       style = cell_fill(color = colors[2]),
       locations = cells_column_spanners()
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold", v_align = "middle"),
+      locations = cells_column_labels(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_column_spanners(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_body(
+        columns = everything(),
+        rows = Uraian == "PDRB"
+      )
     ) %>%
     tab_options(
       table.border.top.color = "white",
@@ -501,7 +517,8 @@ create_table_adhb_adhk <- function(df_wide = NULL) {
       table.font.names = "Lato"
       # data_row.padding = px(20),
       # column_labels.padding = px(25),
-    )
+    ) %>%
+    cols_width(Uraian ~ pct(15))
 }
 
 # Gabungkan data pertumbuhan lapangan usaha y-to-y dan q-to-q
@@ -533,19 +550,19 @@ df_pertumbuhan_34_wide <- df_pertumbuhan_34 %>%
 create_table_pertumbuhan <- function(df_wide = NULL) {
   df_wide %>%
     gt() %>%
-    tab_spanner(label = "Y to Y", columns = contains("Y to Y")) %>%
-    tab_spanner(label = "Q to Q", columns = contains("Q to Q")) %>%
+    tab_spanner(label = "Pertumbuhan Y on Y", columns = contains("Y to Y")) %>%
+    tab_spanner(label = "Pertumbuhan Q to Q", columns = contains("Q to Q")) %>%
     cols_label(
-      `Q3 2025_Y to Y` = "Triwulan III 2025",
-      `Q4 2025_Y to Y` = "Triwulan IV 2025",
-      `Q3 2025_Q to Q` = "Triwulan III 2025",
-      `Q4 2025_Q to Q` = "Triwulan IV 2025",
+      `Q3 2025_Y to Y` ~ "Triwulan III 2025",
+      `Q4 2025_Y to Y` ~ "Triwulan IV 2025",
+      `Q3 2025_Q to Q` ~ "Triwulan III 2025",
+      `Q4 2025_Q to Q` ~ "Triwulan IV 2025",
+      Uraian ~ 'Komponen'
     ) %>%
-    cols_label(Uraian = 'Komponen') %>%
     fmt_number(dec_mark = ",", sep_mark = ".", decimals = 2) %>%
     tab_footnote(
       footnote = "y-on-y: PDRB ADHK pada suatu triwulan dibandingkan dengan triwulan yang sama tahun sebelumnya",
-      locations = cells_column_spanners(spanners = contains("Y to Y"))
+      locations = cells_column_spanners(spanners = contains("Y on Y"))
     ) %>%
     tab_footnote(
       footnote = "q-to-q: PDRB ADHK pada suatu triwulan dibandingkan dengan triwulan sebelumnya",
@@ -566,6 +583,21 @@ create_table_pertumbuhan <- function(df_wide = NULL) {
     gt::tab_style(
       style = cell_fill(color = colors[2]),
       locations = cells_column_spanners()
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold", v_align = "middle"),
+      locations = cells_column_labels(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_column_spanners(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_body(
+        columns = everything(),
+        rows = Uraian == "PDRB"
+      )
     ) %>%
     tab_options(
       table.border.top.color = "white",
@@ -598,11 +630,11 @@ create_table_distribusi <- function(df = NULL) {
     ) %>%
     gt() %>%
     cols_label(
-      `Q1 2025` = "Triwulan I 2025",
-      `Q2 2025` = "Triwulan II 2025",
-      `Q3 2025` = "Triwulan III 2025",
-      `Q4 2025` = "Triwulan IV 2025",
-      Uraian = "Komponen"
+      `Q1 2025` ~ "Triwulan I 2025",
+      `Q2 2025` ~ "Triwulan II 2025",
+      `Q3 2025` ~ "Triwulan III 2025",
+      `Q4 2025` ~ "Triwulan IV 2025",
+      Uraian ~ "Komponen"
     ) %>%
     fmt_number(
       dec_mark = ",",
@@ -624,6 +656,21 @@ create_table_distribusi <- function(df = NULL) {
       style = cell_fill(color = colors[2]),
       locations = cells_column_spanners()
     ) %>%
+    tab_style(
+      style = cell_text(weight = "bold", v_align = "middle"),
+      locations = cells_column_labels(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_column_spanners(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_body(
+        columns = everything(),
+        rows = Uraian == "PDRB"
+      )
+    ) %>%
     tab_options(
       table.border.top.color = "white",
       table.border.right.color = "white",
@@ -637,10 +684,144 @@ create_table_distribusi <- function(df = NULL) {
       table.border.top.width = px(1),
       table.border.bottom.width = px(1),
       table.font.size = "10pt",
-      page.width = pct(100),
+      # page.width = pct(100),
+      table.font.names = "Lato",
+      # data_row.padding = px(20),
+      # column_labels.padding = px(25),
+      table.width = pct(100)
+    ) %>%
+    cols_width(everything() ~ pct(100 / 5))
+}
+
+
+df_pengeluaran_adhb_adhk <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "pdrb_adhb_adhk"
+)
+
+create_table_pdrb_pengeluaran_adhb_adhk <- function(df = NULL) {
+  df_pengeluaran_adhb_adhk_long <- df %>%
+    pivot_longer(
+      -`Komponen Pengeluaran`,
+      names_to = "triwulan",
+      values_to = "nilai"
+    ) %>%
+    mutate(
+      kategori = case_when(
+        `Komponen Pengeluaran` ==
+          "1. Pengeluaran Konsumsi Rumah Tangga" ~ "PKRT",
+        `Komponen Pengeluaran` == "3. Pengeluaran Konsumsi Pemerintah" ~ "PKP",
+        `Komponen Pengeluaran` == "4. Pembentukan Modal Tetap Bruto" ~ "PMTB",
+        `Komponen Pengeluaran` == "P D R B" ~ "PDRB",
+        TRUE ~ "Lainnya"
+      )
+    ) %>%
+    group_by(kategori, triwulan) %>%
+    summarise(nilai = sum(nilai), .groups = "drop") %>%
+    mutate(kategori = factor(kategori)) %>%
+    mutate(nilai = round(nilai / 1000, 2))
+
+  df_pengeluaran_adhb_adhk_wide <- df_pengeluaran_adhb_adhk_long %>%
+    pivot_wider(
+      id_cols = kategori,
+      names_from = triwulan,
+      values_from = nilai
+    ) %>%
+    mutate(
+      urut = case_when(
+        kategori == "PKRT" ~ 1,
+        kategori == "PKP" ~ 2,
+        kategori == "PMTB" ~ 3,
+        kategori == "Lainnya" ~ 4,
+        TRUE ~ 5
+      )
+    ) %>%
+    arrange(urut)
+
+  df_pengeluaran_adhb_adhk_wide
+}
+
+create_table_pengeluaran_adhb_adhk <- function(df_wide = NULL) {
+  df_wide %>%
+    select(-urut) %>%
+    gt() %>%
+    tab_spanner(
+      label = "Harga Berlaku",
+      columns = contains("ADHB")
+    ) %>%
+    tab_spanner(
+      label = "Harga Konstan",
+      columns = contains("ADHK")
+    ) %>%
+    cols_label(
+      kategori ~ "Komponen",
+      `ADHB-Q1-2025` ~ "Triwulan I 2025",
+      `ADHB-Q2-2025` ~ "Triwulan II 2025",
+      `ADHB-Q3-2025` ~ "Triwulan III 2025",
+      `ADHB-Q4-2025` ~ "Triwulan IV 2025",
+      `ADHK-Q1-2025` ~ "Triwulan I 2025",
+      `ADHK-Q2-2025` ~ "Triwulan II 2025",
+      `ADHK-Q3-2025` ~ "Triwulan III 2025",
+      `ADHK-Q4-2025` ~ "Triwulan IV 2025",
+    ) %>%
+    fmt_number(dec_mark = ",", sep_mark = ".") %>%
+    cols_align(align = "left", columns = kategori) %>%
+    data_color(
+      colors = c("#AA5F81", "#f1c161"),
+      columns = !contains("Uraian")
+    ) %>%
+    data_color(
+      colors = colors[2],
+      columns = contains("Uraian")
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_labels()
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_spanners()
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold", v_align = "middle"),
+      locations = cells_column_labels(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_column_spanners(everything())
+    ) %>%
+    data_color(
+      columns = contains("kategori"),
+      colors = colors[2]
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_body(
+        columns = everything(),
+        rows = kategori == "PDRB"
+      )
+    ) %>%
+    tab_options(
+      table.border.top.color = "white",
+      table.border.right.color = "white",
+      table.border.bottom.color = "white",
+      table.border.left.color = "white",
+
+      table.border.top.width = px(1),
+      table.border.left.width = px(1),
+      table.border.bottom.width = px(1),
+      table.border.right.width = px(1),
+
+      table_body.hlines.color = "white",
+      table_body.vlines.color = "white",
+      table_body.hlines.width = px(1),
+      table_body.vlines.width = px(1),
+      heading.border.bottom.color = "white",
+
+      table.font.size = "10pt",
       table.font.names = "Lato"
       # data_row.padding = px(20),
       # column_labels.padding = px(25),
-      # table.width = pct(1000)
-    )
+    ) %>%
+    cols_width(kategori ~ pct(15))
 }

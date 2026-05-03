@@ -2,6 +2,18 @@
   line(length: 50%, stroke: 1pt + rgb("#F68838"))
 }
 
+#let statistic-box(text-stat: "") = {
+box(
+    width: 0.75in,
+    height: 0.75in,
+    fill: none,
+    inset: 6pt,
+    align(center+horizon)[
+      #text(fill: rgb("#F68838"), size: 35pt, weight: "bold")[#text-stat]
+    ]
+  )
+}
+
 #let status-box(top-box-text: "", bottom-box-text: "") = {
   let top_box = box(
     width: 1.5in,

@@ -7,6 +7,7 @@ crossref:
    fig-title: "Gambar"
 format:
    typst:
+      layout: full
       template-partials: 
          - typst-show.typ
          - typst-template.typ
@@ -60,13 +61,13 @@ df_pertumbuhan_q <- cleaning_data_line(df_pertumbuhan_q)
 #status-box(top-box-text: [1004M], bottom-box-text: [3,27%])
 ],
 [
-PDRB kabupaten Kepulauan Tanimbar pada triwulan IV 2025 sebesar 1500 Miliar Rupiah. Pada periode yang sama, pertumbuhan ekonomi sebesar 4,59 persen secara q-to-q (dibandingkan periode Triwulan III 2025).
+PDRB kabupaten Kepulauan Tanimbar pada triwulan IV 2025 sebesar 1004 Miliar Rupiah. Pada periode yang sama, pertumbuhan ekonomi sebesar 3,27 persen secara q-to-q (dibandingkan periode Triwulan III 2025).
 ]
 )
 // #orangeline()
 ```
 
-Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 dibanding triwulan III-2025 (q-to-q) mengalami pertumbuhan sebesar 3,27 persen. Lapangan usaha yang mengalami pertumbuhan tertinggi adalah sektor Sekunder sebesar 5,85 persen; selanjutnya sektor tersier sebesar  3,79 persen; dan sektor primer sebesar -0,2 persen.
+Berdasarkan klasifikasi 3 sektor lapangan usaha, sektor sekunder mengalami pertumbuhan tertinggi yaitu sebesar 5,85 persen; selanjutnya diikuti sektor tersier sebesar  3,79 persen; sedangkan sektor primer mengalami pertumbuhan negatif sebesar -0,2 persen.
 
 
 ```{r pertumbuhan-q-to-q}
@@ -87,7 +88,7 @@ line_chart(df_pertumbuhan_q)
 #grid(
   columns: (1fr, 1fr),
   [
-    Struktur PDRB Kabupaten Kepulauan Tanimbar menurut lapangan usaha atas dasar harga berlaku triwulan IV-2025 tidak menunjukkan perubahan berarti. Perekonomian Kabupaten Kepulauan Tanimbar masih didominasi oleh lapangan usaha sektor tersier sebesar 60,31 persen; diikuti oleh sektor primer sebesar 22,12 persen; dan sektor sekunder sebesar 17,48 persen.
+    Struktur PDRB Kabupaten Kepulauan Tanimbar menurut lapangan usaha atas dasar harga berlaku triwulan IV-2025 tidak menunjukkan perubahan berarti. Perekonomian Kabupaten Kepulauan Tanimbar masih didominasi oleh lapangan usaha sektor tersier sebesar 60,2 persen; diikuti oleh sektor primer sebesar 20,7 persen; dan sektor sekunder sebesar 19,1 persen.
   ],
   [
 ```
@@ -123,7 +124,20 @@ pie_chart(df_distribusi2, label_size = 2.5)
 
 ## Pertumbuhan Ekonomi Triwulan IV-2025 Terhadap Triwulan IV-2024 (y-on-y)
 
-Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 dibanding triwulan IV-2024 (y-on-y) mengalami pertumbuhan sebesar 5,01 persen. Lapangan usaha yang mengalami pertumbuhan tertinggi adalah sektor Tersier sebesar 5,92 persen; selanjutnya sektor Primer sebesar 5,59 persen; dan sektor Sekunder sebesar 1,19 persen.
+```{=typst}
+
+#grid(
+  columns: (1fr, 4fr),
+  // column-gutter: 3pt,
+  [
+    #statistic-box(text-stat: [5,29%])
+  ],
+  [
+    Ekonomi Kabupaten Kepulauan Tanimbar triwulan IV-2025 dibanding triwulan IV-2024 (y-on-y) mengalami pertumbuhan sebesar 5,29 persen. Lapangan usaha yang mengalami pertumbuhan tertinggi adalah sektor primer yaitu sebesar 8,57 persen; selanjutnya sektor sekunder sebesar 6,84 persen; dan sektor tersier sebesar 3,68 persen.
+  ]
+)
+
+```
 
 
 ```{r pertumbuhan-y-on-y}
@@ -317,14 +331,12 @@ line_chart_pertumbuhan_pengeluaran(df_pertumbuhan_pengeluaran_c)
 
 {{< pagebreak >}}
 
-### Tabel 1 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Sektor Lapangan Usaha (miliar rupiah), Triwulan I - IV Tahun 2025
+### Tabel 1 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Sektor Lapangan Usaha (miliar rupiah), Triwulan I - IV 2025
 
 
 ```{r}
 #| echo: false
 #| warning: false
-#fig-width: 8.5
-#fig-height: 6
 
 df_pdrb_adhb_adhk <- read_excel(
   "data/olah-data.xlsx",
@@ -381,12 +393,36 @@ create_table_pertumbuhan(df_pertumbuhan_34_wide)
 ```{r}
 #| echo: false
 #| warning: false
-#fig-width: 8
+#| tbl-width: 100%
 
 create_table_distribusi(df_distribusi)
 ```
 
-### Tabel 4 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Pengeluaran (miliar rupiah), Triwulan III Tahun 2025 dan Triwulan IV Tahun 2025
+
+{{< pagebreak >}}
+
+### Tabel 4 PDRB Atas Dasar Harga Berlaku dan Harga Konstan 2010 Menurut Pengeluaran (miliar rupiah), Triwulan I - IV 2025
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+df_pengeluaran_adhb_adhk <- read_excel(
+  "data/8101 PDRB Pengeluaran TW 4 2025.xlsx",
+  sheet = "pdrb_adhb_adhk"
+)
+
+df_pengeluaran_adhb_adhk_wide <- create_table_pdrb_pengeluaran_adhb_adhk(df_pengeluaran_adhb_adhk)
+```
+
+
+```{r}
+#| echo: false
+#| warning: false
+create_table_pengeluaran_adhb_adhk(df_pengeluaran_adhb_adhk_wide)
+```
+
 
 ### Tabel 5 Laju Pertumbuhan dan Sumber Pertumbuhan PDRB Menurut Pengeluaran (persen)
 
