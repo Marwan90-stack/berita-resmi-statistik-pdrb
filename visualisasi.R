@@ -156,6 +156,7 @@ df_pertumbuhan_pengeluaran_q <- read_excel(
 
 clean_data_pengeluaran <- function(df = NULL) {
   df <- df %>%
+    filter(`Komponen Pengeluaran` != "P D R B") %>%
     pivot_longer(
       -`Komponen Pengeluaran`,
       names_to = "triwulan",
@@ -204,11 +205,11 @@ clean_data_pengeluaran <- function(df = NULL) {
 }
 # kategori <- c("PKP", "PKRT", "PMTB", "Lainnya")
 # levels(df_pertumbuhan_pengeluaran_q$kategori) <- kategori
-df_pertumbuhan_pengeluaran_q <- clean_data_pengeluaran(
+df_pertumbuhan_pengeluaran_q_long <- clean_data_pengeluaran(
   df_pertumbuhan_pengeluaran_q
 )
 
-colors2 <- df_pertumbuhan_pengeluaran_q %>%
+colors2 <- df_pertumbuhan_pengeluaran_q_long %>%
   select(kategori, color) %>%
   distinct(kategori, color)
 
@@ -270,6 +271,8 @@ df_distribusi_2025 <- read_excel(
 
 clean_distribusi <- function(df = NULL) {
   df <- df %>%
+    select(`Komponen Pengeluaran`, `Q4-2025`) %>%
+    filter(`Komponen Pengeluaran` != "P D R B") %>%
     clean_names() %>%
     mutate(
       kategori = case_when(
@@ -287,11 +290,12 @@ clean_distribusi <- function(df = NULL) {
       label = paste0(number(nilai, decimal.mark = ","), "%"),
       hjust = if_else(nilai < 0, 1.25, -0.25)
     )
+  df
 }
 
 bar_chart <- function(df = NULL) {
   ggplot(
-    df_distribusi_2025,
+    df,
     aes(y = fct_reorder(kategori, nilai), x = nilai, fill = kategori)
   ) +
     geom_bar(stat = "identity") +
@@ -825,3 +829,300 @@ create_table_pengeluaran_adhb_adhk <- function(df_wide = NULL) {
     ) %>%
     cols_width(kategori ~ pct(15))
 }
+
+
+# Tabel untuk pertumbuhan pengeluaran q-to-q dan y-on-y
+
+convert_df_pengeluaran_to_wide <- function(df = NULL, jenis = "q-to-q") {
+  df %>%
+    pivot_longer(
+      -`Komponen Pengeluaran`,
+      names_to = "triwulan",
+      values_to = "nilai"
+    ) %>%
+    filter(triwulan == "Q3-2025" | triwulan == "Q4-2025") %>%
+    mutate(
+      kategori = case_when(
+        `Komponen Pengeluaran` ==
+          "1. Pengeluaran Konsumsi Rumah Tangga" ~ "PK-RT",
+        `Komponen Pengeluaran` == "3. Pengeluaran Konsumsi Pemerintah" ~ "PK-P",
+        `Komponen Pengeluaran` == "4. Pembentukan Modal Tetap Bruto" ~ "PMTB",
+        `Komponen Pengeluaran` == "P D R B" ~ "PDRB",
+        TRUE ~ "Lainnya"
+      )
+    ) %>%
+    group_by(triwulan, kategori) %>%
+    summarise(nilai = sum(nilai), .groups = "drop") %>%
+    mutate(
+      no_urut = case_when(
+        kategori == "PK-RT" ~ 1,
+        kategori == "PK-P" ~ 2,
+        kategori == "PMTB" ~ 3,
+        kategori == "Lainnya" ~ 4,
+        TRUE ~ 5
+      )
+    ) %>%
+    arrange(no_urut) %>%
+    mutate(jenis = jenis) %>%
+    pivot_wider(
+      id_cols = c(no_urut, kategori),
+      names_from = c(jenis, triwulan),
+      values_from = nilai
+    )
+}
+
+df_pertumbuhan_pengeluaran_q_wide <- convert_df_pengeluaran_to_wide(
+  df_pertumbuhan_pengeluaran_q,
+  jenis = "q-to-q"
+)
+df_pertumbuhan_pengeluaran_y_wide <- convert_df_pengeluaran_to_wide(
+  df_pertumbuhan_pengeluaran_y,
+  jenis = "y-on-y"
+)
+
+df_pertumbuhan_gabung <- df_pertumbuhan_pengeluaran_q_wide %>%
+  left_join(df_pertumbuhan_pengeluaran_y_wide, join_by("kategori", "no_urut"))
+
+
+create_tabel_pertumbuhan_pengeluaran <- function(df_wide = NULL) {
+  df_wide %>%
+    select(-no_urut) %>%
+    gt() %>%
+    tab_spanner(
+      label = "Pertumbuhan Q to Q",
+      columns = contains("q-to-q")
+    ) %>%
+    tab_spanner(
+      label = "Pertumbuhan Y on Y",
+      columns = contains("y-on-y")
+    ) %>%
+    cols_label(
+      `q-to-q_Q3-2025` ~ "Triwulan III 2025",
+      `q-to-q_Q4-2025` ~ "Triwulan IV 2025",
+      `y-on-y_Q3-2025` ~ "Triwulan III 2025",
+      `y-on-y_Q4-2025` ~ "Triwulan IV 2025",
+      kategori ~ "Komponen"
+    ) %>%
+    tab_style(
+      style = list(
+        cell_text(weight = "bold", v_align = "middle")
+      ),
+      locations = cells_column_labels()
+    ) %>%
+    tab_style(
+      style = list(
+        cell_text(weight = "bold", v_align = "middle")
+      ),
+      locations = cells_column_spanners()
+    ) %>%
+    fmt_number(decimals = 2, dec_mark = ",", sep_mark = ".") %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_body(
+        columns = everything(),
+        rows = kategori == "PDRB"
+      )
+    ) %>%
+    data_color(
+      colors = c("#AA5F81", "#f1c161"),
+      columns = !contains("kategori")
+    ) %>%
+    data_color(
+      colors = colors[2],
+      columns = contains("kategori")
+    ) %>%
+    tab_footnote(
+      footnote = "y-on-y: PDRB ADHK pada suatu triwulan dibandingkan dengan triwulan yang sama tahun sebelumnya",
+      locations = cells_column_spanners(spanners = contains("Y on Y"))
+    ) %>%
+    tab_footnote(
+      footnote = "q-to-q: PDRB ADHK pada suatu triwulan dibandingkan dengan triwulan sebelumnya",
+      locations = cells_column_spanners(spanners = contains("Q to Q"))
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_labels()
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_spanners()
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold", v_align = "middle"),
+      locations = cells_column_labels(everything())
+    ) %>%
+    tab_style(
+      style = cell_text(weight = "bold"),
+      locations = cells_column_spanners(everything())
+    ) %>%
+    tab_options(
+      table.border.top.color = "white",
+      table.border.right.color = "white",
+      table.border.bottom.color = "white",
+      table.border.left.color = "white",
+
+      table_body.hlines.color = "white",
+      table_body.vlines.color = "white",
+      heading.border.bottom.color = "white",
+
+      table.border.top.width = px(1),
+      table.border.bottom.width = px(1),
+      table.font.size = "10pt",
+      # page.width = pct(100),
+      table.font.names = "Lato",
+      # data_row.padding = px(20),
+      # column_labels.padding = px(25),
+      table.width = pct(100)
+    ) %>%
+    cols_width(everything() ~ pct(100 / 5))
+}
+
+# Fungsi untuk tabel distribusi pengeluaran 2025
+clean_df_distribusi_pengeluaran <- function(df = NULL) {
+  df %>%
+    pivot_longer(
+      -`Komponen Pengeluaran`,
+      names_to = "triwulan",
+      values_to = "nilai"
+    ) %>%
+    mutate(
+      kategori = case_when(
+        `Komponen Pengeluaran` ==
+          "1. Pengeluaran Konsumsi Rumah Tangga" ~ "PKRT",
+        `Komponen Pengeluaran` == "3. Pengeluaran Konsumsi Pemerintah" ~ "PKP",
+        `Komponen Pengeluaran` == "4. Pembentukan Modal Tetap Bruto" ~ "PMTB",
+        `Komponen Pengeluaran` == "P D R B" ~ "PDRB",
+        TRUE ~ "Lainnya"
+      )
+    ) %>%
+    group_by(kategori, triwulan) %>%
+    summarise(nilai = sum(nilai), .groups = "drop") %>%
+    mutate(
+      no_urut = case_when(
+        kategori == "PKRT" ~ 1,
+        kategori == "PKP" ~ 2,
+        kategori == "PMTB" ~ 3,
+        kategori == "Lainnya" ~ 4,
+        TRUE ~ 5
+      )
+    ) %>%
+    arrange(no_urut) %>%
+    pivot_wider(
+      id_cols = c(no_urut, kategori),
+      names_from = triwulan,
+      values_from = nilai
+    ) %>%
+    select(-no_urut)
+}
+
+
+create_table_distribusi_pengeluaran <- function(df_wide = NULL) {
+  df_wide %>%
+    gt() %>%
+    cols_label(
+      kategori ~ "Komponen",
+      `Q1-2025` ~ "Triwulan I 2025",
+      `Q2-2025` ~ "Triwulan II 2025",
+      `Q3-2025` ~ "Triwulan III 2025",
+      `Q4-2025` ~ "Triwulan IV 2025",
+    ) %>%
+    fmt_number(
+      decimals = 2,
+      dec_mark = ",",
+      sep_mark = "."
+    ) %>%
+    tab_style(
+      style = list(
+        cell_text(weight = "bold", v_align = "middle")
+      ),
+      locations = cells_column_labels()
+    ) %>%
+    tab_style(
+      style = list(
+        cell_text(weight = "bold", v_align = "middle")
+      ),
+      locations = cells_body(
+        columns = everything(),
+        rows = kategori == "PDRB"
+      )
+    ) %>%
+    cols_width(
+      everything() ~ pct(100 / 5)
+    ) %>%
+    data_color(
+      colors = c("#AA5F81", "#f1c161"),
+      columns = !contains("kategori")
+    ) %>%
+    data_color(
+      colors = colors[2],
+      columns = contains("kategori")
+    ) %>%
+    gt::tab_style(
+      style = cell_fill(color = colors[2]),
+      locations = cells_column_labels()
+    ) %>%
+    tab_options(
+      table.border.top.color = "white",
+      table.border.right.color = "white",
+      table.border.bottom.color = "white",
+      table.border.left.color = "white",
+
+      table_body.hlines.color = "white",
+      table_body.vlines.color = "white",
+      heading.border.bottom.color = "white",
+
+      table.border.top.width = px(1),
+      table.border.bottom.width = px(1),
+      table.font.size = "10pt",
+      # page.width = pct(100),
+      table.font.names = "Lato",
+      # data_row.padding = px(20),
+      # column_labels.padding = px(25),
+      table.width = pct(100)
+    )
+}
+
+# Plot pertumbuhan:
+
+plot_pertumbuhan_y <- line_chart(df_pertumbuhan_y)
+
+ggsave(
+  filename = "plot_pertumbuhan.png",
+  plot = plot_pertumbuhan_y,
+  width = 8,
+  height = 4,
+  bg = "transparent",
+  # bg = "#f7f1ea",
+  dpi = 200,
+  units = "in"
+)
+
+# Donut chart
+
+plot_pie <- pie_chart(cleaning_data_pie(df_distribusi))
+
+ggsave(
+  filename = "plot_pie.png",
+  plot = plot_pie,
+  width = 4,
+  height = 4,
+  bg = "transparent",
+  # bg = "#f7f1ea",
+  dpi = 200,
+  units = "in"
+)
+
+
+# Bar chart:
+
+plot_bar <- bar_chart(clean_distribusi(df_distribusi_2025))
+ggsave(
+  filename = "plot_bar.png",
+  plot = plot_bar,
+  width = 6,
+  height = 4,
+  bg = "transparent",
+  # bg = "#f7f1ea",
+  dpi = 200,
+  units = "in"
+)
